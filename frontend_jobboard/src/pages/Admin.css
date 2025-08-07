@@ -1,0 +1,61 @@
+.admin-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.admin-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.create-job-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.create-job-form input,
+.create-job-form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.create-job-form button {
+  align-self: flex-start;
+  padding: 10px 20px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.create-job-form button:hover {
+  background-color: #218838;
+}
+
+.job-manage-card {
+  border-bottom: 1px solid #eee;
+  padding: 15px 0;
+}
+.job-manage-card:last-child {
+  border-bottom: none;
+}
+
+.application-list {
+  margin-top: 15px;
+  padding-left: 20px;
+  border-left: 3px solid #007bff;
+}
+
+.application-card {
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}

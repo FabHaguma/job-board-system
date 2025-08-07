@@ -1,0 +1,30 @@
+.apply-form-container {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  border: 1px solid #eee;
+}
+
+.apply-form-container h4 {
+  margin-top: 0;
+}
+
+.apply-form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apply-form-container input,
+.apply-form-container textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Important for width calculation */
+}
+
+.apply-form-container button {
+    align-self: flex-start;
+}

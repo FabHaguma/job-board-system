@@ -1,0 +1,41 @@
+.job-list {
+  display: grid;
+  gap: 20px;
+}
+
+.job-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.job-card h2 {
+  margin-top: 0;
+  color: #0056b3;
+}
+
+.job-card .job-location {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.job-card .job-company {
+  color: #333;
+}
+
+.job-card button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.job-card button:hover {
+  background-color: #0056b3;
+}
