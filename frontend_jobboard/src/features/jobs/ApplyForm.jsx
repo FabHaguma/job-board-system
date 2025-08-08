@@ -1,37 +1,34 @@
 import { useState } from 'react';
 import api from '../../services/api';
-import './ApplyForm.css'; // We will create this next
+import './ApplyForm.css';
 
 const ApplyForm = ({ jobId }) => {
-  const [formData, setFormData] = useState({
-    cover_letter: '',
-    cv_url: '',
-  });
+  const [coverLetter, setCoverLetter] = useState('');
+  const [cvFile, setCvFile] = useState(null); // State for the file object
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
 
-  const { cover_letter, cv_url } = formData;
-
-  const onChange = (e) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
+  const handleFileChange = (e) => {
+    setCvFile(e.target.files[0]);
   };
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    if (!cover_letter || !cv_url) {
+    if (!coverLetter || !cvFile) {
       setIsError(true);
-      setMessage('Please fill out all fields.');
+      setMessage('Please provide both a cover letter and a CV file.');
       return;
     }
 
+    const formData = new FormData();
+    formData.append('cover_letter', coverLetter);
+    formData.append('cv_file', cvFile);
+
     try {
-      await api.post(`/jobs/${jobId}/apply`, { cover_letter, cv_url });
+      // The content type is automatically set to multipart/form-data by the browser
+      await api.post(`/jobs/${jobId}/apply`, formData);
       setIsError(false);
       setMessage('Application submitted successfully!');
-      // Optionally, disable form or hide it after submission
     } catch (error) {
       setIsError(true);
       setMessage(error.response?.data?.message || 'Failed to submit application.');
@@ -43,21 +40,23 @@ const ApplyForm = ({ jobId }) => {
       <h4>Submit Your Application</h4>
       <form onSubmit={onSubmit}>
         <textarea
-          name="cover_letter"
-          value={cover_letter}
-          onChange={onChange}
+          value={coverLetter}
+          onChange={(e) => setCoverLetter(e.target.value)}
           placeholder="Your Cover Letter"
           rows="5"
           required
         ></textarea>
+        
+        {/* Replace text input with file input */}
+        <label>Upload CV (PDF only)</label>
         <input
-          type="text"
-          name="cv_url"
-          value={cv_url}
-          onChange={onChange}
-          placeholder="Link to your CV (e.g., LinkedIn, Google Drive)"
+          type="file"
+          name="cv_file"
+          accept=".pdf"
+          onChange={handleFileChange}
           required
         />
+        
         <button type="submit">Submit Application</button>
       </form>
       {message && (

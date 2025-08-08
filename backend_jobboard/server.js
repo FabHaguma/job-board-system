@@ -5,6 +5,8 @@ const helmet = require('helmet');
 
 const authRoutes = require('./src/routes/authRoutes');
 const jobRoutes = require('./src/routes/jobRoutes');
+const userRoutes = require('./src/routes/userRoutes');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,10 +16,13 @@ app.use(cors()); // Allow requests from our frontend
 app.use(helmet()); // Basic security headers
 app.use(express.json()); // To parse JSON bodies
 app.use(express.urlencoded({ extended: true }));
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
   res.send('Job Board API is running...');

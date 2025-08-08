@@ -1,5 +1,3 @@
--- Migration to add features for Iteration 2
-
 -- Add new columns to the jobs table
 ALTER TABLE jobs ADD COLUMN requirements TEXT;
 ALTER TABLE jobs ADD COLUMN salary TEXT; -- Storing as TEXT for flexibility (e.g., "$80k - $100k", "Competitive")

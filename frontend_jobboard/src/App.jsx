@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './features/auth/LoginPage';
 import RegisterPage from './features/auth/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
+import JobDetailPage from './pages/JobDetailPage';
 // Simple Header for navigation
 const Header = () => {
     return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/jobs/:id" element={<JobDetailPage />} />
           {/* Add more routes here */}
         </Routes>
       </div>

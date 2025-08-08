@@ -1,22 +1,30 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
-import ApplyForm from './ApplyForm'; // We will create this next
-import './Job.css'; // We will create this css file next
+import './Job.css';
 
 const JobListPage = () => {
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [applyingToJobId, setApplyingToJobId] = useState(null);
 
-  const { user } = useSelector((state) => state.auth);
+  // New state for filtering and pagination
+  const [filters, setFilters] = useState({ search: '', location: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchJobs = async () => {
+      setIsLoading(true);
       try {
-        const response = await api.get('/jobs');
-        setJobs(response.data);
+        const params = new URLSearchParams({
+          page: currentPage,
+          limit: 5, // Show 5 jobs per page
+          ...filters
+        });
+        const response = await api.get(`/jobs?${params.toString()}`);
+        setJobs(response.data.data);
+        setTotalPages(response.data.totalPages);
       } catch (err) {
         setError('Failed to fetch jobs.');
         console.error(err);
@@ -24,38 +32,63 @@ const JobListPage = () => {
         setIsLoading(false);
       }
     };
-
     fetchJobs();
-  }, []);
+  }, [filters, currentPage]); // Re-fetch when filters or page changes
 
-  const handleApplyClick = (jobId) => {
-    // Toggle the application form
-    setApplyingToJobId(currentId => (currentId === jobId ? null : jobId));
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+    setCurrentPage(1); // Reset to first page on new filter
   };
-
-  if (isLoading) return <p>Loading jobs...</p>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
     <div>
       <h1>Current Job Openings</h1>
-      <div className="job-list">
-        {jobs.length > 0 ? jobs.map((job) => (
-          <div key={job.id} className="job-card">
-            <h2>{job.title}</h2>
-            <p className="job-location">{job.location}</p>
-            <p className="job-company">{job.company_description}</p>
-            {/* Show Apply button only to logged-in users */}
-            {user && user.role === 'user' && (
-              <button onClick={() => handleApplyClick(job.id)}>
-                {applyingToJobId === job.id ? 'Cancel' : 'Apply Now'}
-              </button>
-            )}
-            {/* Conditionally render the application form */}
-            {applyingToJobId === job.id && <ApplyForm jobId={job.id} />}
-          </div>
-        )) : <p>No job openings at the moment. Please check back later.</p>}
+      
+      {/* Filter Section */}
+      <div className="filter-container">
+        <input
+          type="text"
+          name="search"
+          placeholder="Search by title or company..."
+          value={filters.search}
+          onChange={handleFilterChange}
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Filter by location..."
+          value={filters.location}
+          onChange={handleFilterChange}
+        />
       </div>
+
+      {isLoading ? <p>Loading jobs...</p> : error ? <p style={{ color: 'red' }}>{error}</p> : (
+        <>
+          <div className="job-list">
+            {jobs.length > 0 ? jobs.map((job) => (
+              <div key={job.id} className="job-card">
+                <Link to={`/jobs/${job.id}`} className="job-link">
+                  <h2>{job.title}</h2>
+                  <p className="job-company-name">{job.company_name}</p>
+                  <p className="job-location">{job.location}</p>
+                  <p className="job-company">{job.company_description}</p>
+                </Link>
+              </div>
+            )) : <p>No matching job openings found.</p>}
+          </div>
+
+          {/* Pagination Section */}
+          <div className="pagination">
+            <button onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>
+              Previous
+            </button>
+            <span>Page {currentPage} of {totalPages}</span>
+            <button onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
