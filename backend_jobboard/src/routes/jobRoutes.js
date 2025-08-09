@@ -1,7 +1,7 @@
 const express = require('express');
 const { 
     getAllJobs, getJobById, createJob, applyToJob, getJobApplications, 
-    updateJob, archiveJob, getAdminAllJobs, updateApplicationStatus 
+    updateJob, archiveJob, getAdminAllJobs, updateApplicationStatus, getAllApplications 
 } = require('../controllers/jobController');
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
@@ -17,6 +17,7 @@ router.post('/:id/apply', protect, applyToJob); // Apply to a job
 // --- Admin Routes ---
 router.post('/', protect, admin, createJob);                // Create a new job
 router.get('/admin/all', protect, admin, getAdminAllJobs);    // Get all jobs (incl. archived)
+router.get('/admin/all-applications', protect, admin, getAllApplications); // Get all applications across all jobs
 router.put('/:id', protect, admin, updateJob);              // Update a job
 router.delete('/:id', protect, admin, archiveJob);          // Archive a job
 router.get('/:id/applications', protect, admin, getJobApplications); // Get applications for a job

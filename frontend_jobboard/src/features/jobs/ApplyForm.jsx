@@ -38,7 +38,7 @@ const ApplyForm = ({ jobId }) => {
   return (
     <div className="apply-form-container">
       <h4>Submit Your Application</h4>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} role="form">
         <textarea
           value={coverLetter}
           onChange={(e) => setCoverLetter(e.target.value)}
@@ -48,9 +48,10 @@ const ApplyForm = ({ jobId }) => {
         ></textarea>
         
         {/* Replace text input with file input */}
-        <label>Upload CV (PDF only)</label>
+        <label htmlFor="cv_file_input">Upload CV (PDF only)</label>
         <input
           type="file"
+          id="cv_file_input"
           name="cv_file"
           accept=".pdf"
           onChange={handleFileChange}

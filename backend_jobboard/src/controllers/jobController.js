@@ -209,11 +209,27 @@ const applyToJob = (req, res) => {
 // ADMIN: Get applications for a job
 const getJobApplications = (req, res) => {
     const job_id = req.params.id;
-    const sql = `SELECT a.id, a.status, u.username, a.cover_letter, a.cv_url, a.application_date 
+    const sql = `SELECT a.id, a.status, u.username, a.cover_letter, a.cv_url, a.application_date as created_at
                  FROM applications a
                  JOIN users u ON a.user_id = u.id
                  WHERE a.job_id = ?`;
     db.all(sql, [job_id], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error fetching applications' });
+        }
+        res.json(rows);
+    });
+};
+
+// ADMIN: Get all applications across all jobs
+const getAllApplications = (req, res) => {
+    const sql = `SELECT a.id, a.status, u.username, a.cover_letter, a.cv_url, a.application_date, 
+                        j.title as job_title, j.company_name, a.job_id
+                 FROM applications a
+                 JOIN users u ON a.user_id = u.id
+                 JOIN jobs j ON a.job_id = j.id
+                 ORDER BY a.application_date DESC`;
+    db.all(sql, [], (err, rows) => {
         if (err) {
             return res.status(500).json({ message: 'Error fetching applications' });
         }
@@ -232,4 +248,5 @@ module.exports = {
     updateApplicationStatus,
     applyToJob,
     getJobApplications,
+    getAllApplications,
 };

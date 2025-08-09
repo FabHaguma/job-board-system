@@ -1,0 +1,97 @@
+.header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1rem 2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-title {
+    text-decoration: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.header-title:hover {
+    color: #f0f0f0;
+}
+
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+}
+
+/* Ensure all items inside header-auth (buttons, links, user menu) align vertically */
+.header-auth > * {
+    align-self: center;
+}
+
+
+
+.admin-link {
+    text-decoration: none;
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.admin-link:hover {
+    background: rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .header-title {
+        font-size: 1.4rem;
+    }
+    
+    .header-auth {
+    gap: 0.5rem;
+    align-items: center;
+    }
+    
+    
+    .admin-link {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.75rem;
+    }
+    
+    .header-title {
+        font-size: 1.2rem;
+    }
+    
+    .header-auth {
+        gap: 0.25rem;
+    }
+    
+    
+    
+    .username {
+        display: none; /* Hide username on very small screens */
+    }
+}
