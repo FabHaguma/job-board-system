@@ -16,6 +16,10 @@ RUN npm ci --only=production
 # Copy the rest of the application code
 COPY . .
 
+# Copy the entrypoint script
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Create uploads directory and set permissions
 RUN mkdir -p uploads/cvs && chmod -R 755 uploads
 
@@ -29,6 +33,9 @@ RUN adduser -S nodejs -u 1001
 # Change ownership of the app directory to nodejs user
 RUN chown -R nodejs:nodejs /app
 USER nodejs
+
+# Set the entrypoint
+ENTRYPOINT ["entrypoint.sh"]
 
 # Start the application
 CMD ["node", "server.js"]
