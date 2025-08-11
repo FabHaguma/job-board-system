@@ -38,6 +38,11 @@ app.get('/', (req, res) => {
   res.send('Job Board API is running...');
 });
 
+// Health check endpoint for Docker
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
 // Multer / generic error handling must be after routes
 app.use(notFound);
 app.use(errorHandler);

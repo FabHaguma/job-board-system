@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend_jobboard
+      dockerfile: Dockerfile
+    container_name: jobboard-backend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-your_super_secret_key_that_is_very_long_and_random}
+    volumes:
+      # Persist uploaded files
+      - backend_uploads:/app/uploads
+      # Persist SQLite database
+      - backend_db:/app/db
+    networks:
+      - internal_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend_jobboard
+      dockerfile: Dockerfile
+    container_name: jobboard-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - caddy_network  # External network for Caddy proxy
+      - internal_network  # Internal network to communicate with backend
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  # External network that Caddy uses
+  caddy_network:
+    external: true
+  
+  # Internal network for frontend-backend communication
+  internal_network:
+    driver: bridge
+    internal: false
+
+volumes:
+  # Persistent storage for backend uploads
+  backend_uploads:
+    driver: local
+  
+  # Persistent storage for SQLite database
+  backend_db:
+    driver: local
