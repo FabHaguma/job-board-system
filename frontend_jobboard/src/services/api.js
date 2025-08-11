@@ -1,6 +1,8 @@
 import axios from 'axios';
-import { store } from '../app/store';
-import { logout } from '../features/auth/authSlice';
+
+// Optional callbacks registered by the app (set in store.js) to avoid circular deps
+let onUnauthorized;
+export const registerUnauthorizedHandler = (fn) => { onUnauthorized = fn; };
 
 const api = axios.create({
   baseURL: '/api', // Proxied by Vite to the backend
@@ -38,9 +40,9 @@ api.interceptors.response.use(
       errorResponse.message = 'Request timeout. Please try again.';
     } else if (error.response?.status === 401) {
       errorResponse.message = 'Session expired. Please login again.';
-      // Auto logout on 401
-      store.dispatch(logout());
-      localStorage.removeItem('token');
+      // Auto logout on 401 (delegated to registered handler to avoid circular import)
+      try { localStorage.removeItem('token'); } catch { /* ignore */ }
+      if (onUnauthorized) onUnauthorized();
     } else if (error.response?.status === 403) {
       errorResponse.message = 'Access denied. You don\'t have permission.';
     } else if (error.response?.status === 404) {

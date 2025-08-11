@@ -37,18 +37,29 @@ const JobDetailPage = () => {
         <p className="company-info">{job.company_description} - <strong>{job.location}</strong></p>
         <p className="salary-info">Salary: {job.salary || 'Not disclosed'}</p>
       </div>
-      <div className="job-detail-body">
-        <h3>Job Description</h3>
-        <p>{job.job_description}</p>
+      
+      {/* Collapsible Job Details */}
+      <div className={`job-detail-body ${showApplyForm ? 'collapsed' : ''}`}>
+        {showApplyForm && (
+          <div className="collapse-toggle" onClick={() => setShowApplyForm(false)}>
+            <span>📋 Show Job Details</span>
+          </div>
+        )}
         
-        <h3>Requirements</h3>
-        <p>{job.requirements}</p>
+        <div className="job-detail-content">
+          <h3>Job Description</h3>
+          <p>{job.job_description}</p>
+          
+          <h3>Requirements</h3>
+          <p>{job.requirements}</p>
 
-        <h3>Tags</h3>
-        <div className="tags">
-          {job.tags && job.tags.split(',').map(tag => <span key={tag} className="tag">{tag}</span>)}
+          <h3>Tags</h3>
+          <div className="tags">
+            {job.tags && job.tags.split(',').map(tag => <span key={tag} className="tag">{tag}</span>)}
+          </div>
         </div>
       </div>
+      
       <div className="job-detail-footer">
         {user && user.role === 'user' && (
           <button onClick={() => setShowApplyForm(!showApplyForm)}>

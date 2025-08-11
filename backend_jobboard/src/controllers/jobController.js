@@ -26,7 +26,7 @@ const upload = multer({
         }
         cb(null, true);
     }
-}).single('cv_file'); // 'cv_file' is the name of the form field
+});
 
 // PUBLIC: Get all jobs with filtering and pagination
 const getAllJobs = (req, res) => {
@@ -164,47 +164,58 @@ const updateApplicationStatus = (req, res) => {
 
 // USER: Apply to a job
 const applyToJob = (req, res) => {
-  upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ message: 'File upload error: ' + err.message });
-    } else if (err) {
-      // Custom error from fileFilter
-      return res.status(400).json({ message: err.message });
-    }
+    // Debug logs to trace incoming multipart data
+    console.log('Incoming application -> params.id:', req.params.id);
+    console.log('Body keys:', Object.keys(req.body || {}));
+    console.log('Cover letter snippet:', (req.body?.cover_letter || '').slice(0,50));
+    console.log('File present:', !!req.file, req.file && { fieldname: req.file.fieldname, originalname: req.file.originalname, size: req.file.size });
 
     const { cover_letter } = req.body;
     const cv_path = req.file ? req.file.path : null;
     const job_id = req.params.id;
+    if(!req.user){
+        return res.status(401).json({ message: 'Not authorized user missing on request' });
+    }
     const user_id = req.user.id;
 
     if (!cover_letter || !cv_path) {
       return res.status(400).json({ message: 'Cover letter and CV file are required.' });
     }
 
-    // Check if user already applied to this job
-    const checkSql = `SELECT id FROM applications WHERE job_id = ? AND user_id = ?`;
-    db.get(checkSql, [job_id, user_id], (err, existingApplication) => {
-        if (err) {
-            return res.status(500).json({ message: 'Error checking existing application' });
-        }
-        if (existingApplication) {
-            return res.status(400).json({ message: 'You have already applied to this job' });
-        }
+    // First check if job exists and is not archived
+    const jobCheckSql = `SELECT id FROM jobs WHERE id = ? AND is_archived = 0`;
+    db.get(jobCheckSql, [job_id], (err, job) => {
+      if (err) {
+        return res.status(500).json({ message: 'Error checking job existence' });
+      }
+      if (!job) {
+        return res.status(404).json({ message: 'Job not found or has been archived' });
+      }
 
-        // Use the file path as the cv_url
-        const sql = `INSERT INTO applications (job_id, user_id, cover_letter, cv_url, status) 
-                     VALUES (?, ?, ?, ?, 'pending')`;
-        db.run(sql, [job_id, user_id, cover_letter, cv_path], function (err) {
+      // Check if user already applied to this job
+      const checkSql = `SELECT id FROM applications WHERE job_id = ? AND user_id = ?`;
+      db.get(checkSql, [job_id, user_id], (err, existingApplication) => {
           if (err) {
-            return res.status(400).json({ message: 'Error submitting application', error: err.message });
+              return res.status(500).json({ message: 'Error checking existing application' });
           }
-          res.status(201).json({ 
-              message: 'Application submitted successfully', 
-              applicationId: this.lastID 
+          if (existingApplication) {
+              return res.status(400).json({ message: 'You have already applied to this job' });
+          }
+
+          // Use the file path as the cv_url
+          const sql = `INSERT INTO applications (job_id, user_id, cover_letter, cv_url, status) 
+                       VALUES (?, ?, ?, ?, 'pending')`;
+          db.run(sql, [job_id, user_id, cover_letter, cv_path], function (err) {
+            if (err) {
+              return res.status(400).json({ message: 'Error submitting application', error: err.message });
+            }
+            res.status(201).json({ 
+                message: 'Application submitted successfully', 
+                applicationId: this.lastID 
+            });
           });
-        });
+      });
     });
-  });
 };
 // ADMIN: Get applications for a job
 const getJobApplications = (req, res) => {
@@ -237,6 +248,27 @@ const getAllApplications = (req, res) => {
     });
 };
 
+// USER: Get user's own applications
+const getUserApplications = (req, res) => {
+    if(!req.user){
+        return res.status(401).json({ message: 'Not authorized user missing on request' });
+    }
+    const user_id = req.user.id;
+    
+    const sql = `SELECT a.id, a.status, a.job_id, a.application_date, 
+                        j.title as job_title, j.company_name
+                 FROM applications a
+                 JOIN jobs j ON a.job_id = j.id
+                 WHERE a.user_id = ?
+                 ORDER BY a.application_date DESC`;
+    db.all(sql, [user_id], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error fetching user applications' });
+        }
+        res.json(rows);
+    });
+};
+
 
 module.exports = {
     getAllJobs,
@@ -249,4 +281,6 @@ module.exports = {
     applyToJob,
     getJobApplications,
     getAllApplications,
+    getUserApplications,
+    upload,
 };

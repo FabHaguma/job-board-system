@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 const authRoutes = require('../../src/routes/authRoutes');
 const jobRoutes = require('../../src/routes/jobRoutes');
@@ -248,22 +249,18 @@ describe('Additional Authentication & Authorization Tests', () => {
 
     const res = await request(app)
       .post('/api/auth/login')
-      .send({ username: 'badlogin', password: 'wrongpassword' })
-      .expect(status => {
-        if (![400, 401].includes(status)) throw new Error('Expected 400 or 401');
-      });
+      .send({ username: 'badlogin', password: 'wrongpassword' });
 
-    expect(res.body).toHaveProperty('error');
+    expect([400, 401].includes(res.status)).toBe(true);
+    expect(res.body).toHaveProperty('message');
   });
 
   it('should deny access to admin route without token', async () => {
     const res = await request(app)
-      .get('/api/users')
-      .expect(status => {
-        if (![401, 403].includes(status)) throw new Error('Expected 401 or 403');
-      });
+      .get('/api/users');
 
-    expect(res.body).toHaveProperty('error');
+    expect([401, 403].includes(res.status)).toBe(true);
+    expect(res.body).toHaveProperty('message');
   });
 
   it('should forbid non-admin user from creating a job', async () => {
@@ -282,12 +279,10 @@ describe('Additional Authentication & Authorization Tests', () => {
     const res = await request(app)
       .post('/api/jobs')
       .set('Authorization', `Bearer ${userToken}`)
-      .send(jobData)
-      .expect(status => {
-        if (![401, 403].includes(status)) throw new Error('Expected 401 or 403');
-      });
+      .send(jobData);
 
-    expect(res.body).toHaveProperty('error');
+    expect([401, 403].includes(res.status)).toBe(true);
+    expect(res.body).toHaveProperty('message');
   });
 });
 
@@ -297,15 +292,21 @@ describe('Data Fetching Tests', () => {
       { id: 1, title: 'Job A', company_name: 'Comp A', archived: 0 },
       { id: 2, title: 'Job B', company_name: 'Comp B', archived: 0 }
     ];
+    const mockCount = { count: 2 };
+    
     db.all.mockImplementationOnce((sql, params, cb) => cb(null, mockJobs));
+    db.get.mockImplementationOnce((sql, params, cb) => cb(null, mockCount));
 
     const res = await request(app)
-      .get('/api/jobs')
-      .expect(200);
+      .get('/api/jobs');
 
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBe(2);
-    expect(res.body[0]).toHaveProperty('title');
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('data');
+    expect(Array.isArray(res.body.data)).toBe(true);
+    expect(res.body.data.length).toBe(2);
+    expect(res.body.data[0]).toHaveProperty('title');
+    expect(res.body).toHaveProperty('totalPages');
+    expect(res.body).toHaveProperty('currentPage');
   });
 
   it('should fetch a single job by id', async () => {
@@ -326,7 +327,7 @@ describe('Data Fetching Tests', () => {
       .get('/api/jobs/9999')
       .expect(404);
 
-    expect(res.body).toHaveProperty('error');
+    expect(res.body).toHaveProperty('message');
   });
 });
 
@@ -335,7 +336,8 @@ describe('Job Application Submission Tests', () => {
     // Mock job existence check
     const mockJob = { id: 4, title: 'Apply Job', archived: 0 };
     db.get
-      .mockImplementationOnce((sql, params, cb) => cb(null, mockJob)); // For job fetch/validation
+      .mockImplementationOnce((sql, params, cb) => cb(null, mockJob)) // For job existence check
+      .mockImplementationOnce((sql, params, cb) => cb(null, null)); // For duplicate application check
 
     // Mock application insert
     db.run.mockImplementationOnce(function (sql, params, cb) {
@@ -345,15 +347,10 @@ describe('Job Application Submission Tests', () => {
     const res = await request(app)
       .post('/api/jobs/4/apply')
       .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        applicant_name: 'Test User',
-        email: 'test@example.com',
-        resume: 'My resume content'
-      })
-      .expect(status => {
-        if (![200, 201].includes(status)) throw new Error('Expected 200 or 201');
-      });
+      .field('cover_letter', 'My cover letter content')
+      .attach('cv_file', Buffer.from('fake pdf content'), { filename: 'resume.pdf', contentType: 'application/pdf' });
 
+    expect([200, 201].includes(res.status)).toBe(true);
     expect(res.body).toHaveProperty('message');
   });
 
@@ -363,14 +360,11 @@ describe('Job Application Submission Tests', () => {
     const res = await request(app)
       .post('/api/jobs/12345/apply')
       .set('Authorization', `Bearer ${userToken}`)
-      .send({
-        applicant_name: 'Test User',
-        email: 'test@example.com',
-        resume: 'Resume'
-      })
-      .expect(404);
+      .field('cover_letter', 'Cover letter')
+      .attach('cv_file', Buffer.from('fake pdf content'), { filename: 'resume.pdf', contentType: 'application/pdf' });
 
-    expect(res.body).toHaveProperty('error');
+    expect(res.status).toBe(404);
+    expect(res.body).toHaveProperty('message');
   });
 });
 
@@ -385,7 +379,7 @@ describe('Duplicate Registration Edge Case', () => {
         if (status < 400) throw new Error('Expected failure status');
       });
 
-    expect(res.body).toHaveProperty('error');
+    expect(res.body).toHaveProperty('message');
   });
 });
 });

@@ -140,3 +140,4 @@ vite.config.ts.timestamp-*
 
 # PDF files
 *.pdf
+database.db

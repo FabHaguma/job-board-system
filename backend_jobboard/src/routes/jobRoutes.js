@@ -1,7 +1,8 @@
 const express = require('express');
 const { 
     getAllJobs, getJobById, createJob, applyToJob, getJobApplications, 
-    updateJob, archiveJob, getAdminAllJobs, updateApplicationStatus, getAllApplications 
+    updateJob, archiveJob, getAdminAllJobs, updateApplicationStatus, getAllApplications,
+    getUserApplications, upload 
 } = require('../controllers/jobController');
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
@@ -12,7 +13,10 @@ router.get('/', getAllJobs);       // GET all jobs with filters/pagination
 router.get('/:id', getJobById);    // GET a single job by ID
 
 // --- User Routes ---
-router.post('/:id/apply', protect, applyToJob); // Apply to a job
+// The 'protect' middleware should come first to handle authentication.
+// Multer's 'upload' middleware will then process the multipart/form-data.
+router.post('/:id/apply', protect, upload.single('cv_file'), applyToJob); // Apply to a job
+router.get('/user/applications', protect, getUserApplications); // Get user's own applications
 
 // --- Admin Routes ---
 router.post('/', protect, admin, createJob);                // Create a new job

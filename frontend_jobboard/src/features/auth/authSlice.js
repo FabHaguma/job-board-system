@@ -1,13 +1,24 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../services/api';
 
-// Get user from localStorage
-const user = JSON.parse(localStorage.getItem('user'));
-const token = localStorage.getItem('token');
+// Safely read persisted auth data (avoid test / SSR crashes)
+let persistedUser = null;
+let persistedToken = null;
+if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+  try {
+    const rawUser = window.localStorage.getItem('user');
+    persistedUser = rawUser ? JSON.parse(rawUser) : null;
+    persistedToken = window.localStorage.getItem('token');
+  } catch {
+    // Ignore JSON / access errors and fall back to defaults
+    persistedUser = null;
+    persistedToken = null;
+  }
+}
 
 const initialState = {
-  user: user || null,
-  token: token || null,
+  user: persistedUser,
+  token: persistedToken,
   isError: false,
   isSuccess: false,
   isLoading: false,

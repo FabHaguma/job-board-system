@@ -2,9 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import LoginPage from '../src/features/auth/LoginPage';
 import authSlice from '../src/features/auth/authSlice';
+import api from '../src/services/api';
+
+vi.mock('../src/services/api');
 
 // Mock Redux store
 const createMockStore = (initialState) => {
@@ -44,7 +47,7 @@ describe('LoginPage', () => {
     );
 
     const form = screen.getByRole('form');
-    await fireEvent.submit(form);
+    fireEvent.submit(form);
 
     const usernameError = await screen.findByText('Username is required');
     const passwordError = await screen.findByText('Password is required');
@@ -54,6 +57,7 @@ describe('LoginPage', () => {
 
   it('should allow submission with valid data', async () => {
     const store = createMockStore({ user: null, isLoading: false });
+    api.post.mockResolvedValue({ data: { user: { username: 'testuser' }, token: 'faketoken' } });
     
     render(
       <Provider store={store}>

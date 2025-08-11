@@ -1,5 +1,5 @@
 .job-detail-container {
-  max-width: 800px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 20px;
   background: #fff;
@@ -41,6 +41,53 @@
 
 .job-detail-body {
   margin-bottom: 30px;
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.job-detail-body.collapsed {
+  max-height: 60px;
+  margin-bottom: 15px;
+}
+
+.job-detail-body.collapsed .job-detail-content {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+.job-detail-content {
+  transition: all 0.3s ease-in-out;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.collapse-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.collapse-toggle:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.collapse-toggle span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
 }
 
 .job-detail-body h3 {
@@ -129,6 +176,15 @@
     width: 100%;
     padding: 15px;
   }
+  
+  .collapse-toggle {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+  
+  .job-detail-body.collapsed {
+    max-height: 70px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -139,5 +195,9 @@
   .job-detail-container {
     margin: 5px;
     padding: 10px;
+  }
+  
+  .collapse-toggle span {
+    font-size: 0.85rem;
   }
 }

@@ -6,8 +6,52 @@
   border: 1px solid #eee;
 }
 
+.apply-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .apply-form-container h4 {
-  margin-top: 0;
+  margin: 0;
+}
+
+.back-to-jobs-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.back-to-jobs-btn:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.back-to-jobs-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(108, 117, 125, 0.25);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 480px) {
+  .apply-form-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .back-to-jobs-btn {
+    order: -1; /* Put the back button first on mobile */
+    align-self: flex-start;
+  }
 }
 
 .apply-form-container form {

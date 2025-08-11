@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../features/auth/authSlice';
+import authReducer, { logout } from '../features/auth/authSlice';
+import { registerUnauthorizedHandler } from '../services/api';
 
 export const store = configureStore({
   reducer: {
@@ -7,3 +8,6 @@ export const store = configureStore({
     // Add other feature slices here later
   },
 });
+
+// Register global API -> store bridge for 401 handling (avoids circular imports)
+registerUnauthorizedHandler(() => store.dispatch(logout()));
