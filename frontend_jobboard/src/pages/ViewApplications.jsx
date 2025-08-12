@@ -87,8 +87,14 @@ const ViewApplications = () => {
     );
   }
 
-  // Backend URL for forming full paths to uploaded files
-  const backendUrl = import.meta.env.VITE_API_URL || '';
+  // Base URL for forming full paths to uploaded files (Option A)
+  // Prefer explicit VITE_FILES_BASE; else derive from VITE_API_URL by stripping trailing '/api';
+  // finally fallback to current origin.
+  const rawApiBase = import.meta.env.VITE_API_URL || '';
+  const filesBase = (
+    import.meta.env.VITE_FILES_BASE
+    || (rawApiBase ? rawApiBase.replace(/\/api\/?$/, '') : (typeof window !== 'undefined' ? window.location.origin : ''))
+  ).replace(/\/+$/, '');
 
   return (
     <div className="admin-dashboard">
@@ -145,7 +151,7 @@ const ViewApplications = () => {
                   <div className="application-field">
                     <strong>CV:</strong>
                     <a 
-                      href={`${backendUrl}/${app.cv_url}`} 
+                      href={`${filesBase}/${String(app.cv_url).replace(/^\/+/, '')}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="cv-link"
