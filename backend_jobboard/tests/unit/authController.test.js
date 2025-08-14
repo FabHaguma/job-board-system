@@ -31,7 +31,7 @@ describe('Auth Controller', () => {
   });
 
   describe('registerUser', () => {
-    it('should register a new user successfully', () => {
+    it('should register a new user successfully and return token + user', () => {
       mockReq.body = {
         username: 'newuser',
         password: 'password123'
@@ -43,6 +43,9 @@ describe('Auth Controller', () => {
         callback.call({ lastID: 1 }, null);
       });
 
+      // Mock JWT sign
+      jest.spyOn(jwt, 'sign').mockReturnValue('mock-token');
+
       registerUser(mockReq, mockRes);
 
       expect(db.run).toHaveBeenCalledWith(
@@ -52,9 +55,12 @@ describe('Auth Controller', () => {
       );
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith({
-        id: 1,
-        username: 'newuser',
-        role: 'user'
+        token: 'mock-token',
+        user: {
+          id: 1,
+          username: 'newuser',
+          role: 'user'
+        }
       });
     });
 

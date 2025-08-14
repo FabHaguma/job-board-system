@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 90vh;
   padding: 2rem;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .register-card {
@@ -33,7 +33,7 @@
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -75,9 +75,9 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #fcb69f;
+  border-color: #667eea;
   background: white;
-  box-shadow: 0 0 0 3px rgba(252, 182, 159, 0.1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .form-input::placeholder {
@@ -90,8 +90,8 @@
 }
 
 .submit-button {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -106,7 +106,7 @@
 
 .submit-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(252, 182, 159, 0.4);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 .submit-button:active {
@@ -127,7 +127,7 @@
 }
 
 .loading-text {
-  color: #fcb69f;
+  color: #667eea;
   font-size: 1.2rem;
   font-weight: 500;
 }
@@ -137,7 +137,7 @@
   width: 20px;
   height: 20px;
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #fcb69f;
+  border-top: 3px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-left: 10px;
@@ -204,14 +204,14 @@
 }
 
 .login-link a {
-  color: #fcb69f;
+  color: #667eea;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .login-link a:hover {
-  color: #fa9b7a;
+  color: #5a67d8;
   text-decoration: underline;
 }
 

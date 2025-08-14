@@ -29,6 +29,11 @@ const initialState = {
 export const register = createAsyncThunk('auth/register', async (userData, thunkAPI) => {
   try {
     const response = await api.post('/auth/register', userData);
+    // Auto-login after successful registration if token is provided
+    if (response.data && response.data.token) {
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('token', response.data.token);
+    }
     return response.data;
   } catch (error) {
     const message = error.response?.data?.message || error.message;
@@ -73,9 +78,14 @@ export const authSlice = createSlice({
       .addCase(register.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(register.fulfilled, (state) => {
+      .addCase(register.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        // Auto-login user after successful registration
+        if (action.payload.token) {
+          state.user = action.payload.user;
+          state.token = action.payload.token;
+        }
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;

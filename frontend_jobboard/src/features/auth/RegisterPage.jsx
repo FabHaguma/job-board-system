@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { register as registerUser, reset } from './authSlice';
+import { register, reset } from './authSlice';
 import './RegisterPage.css';
 
 const RegisterPage = () => {
@@ -25,7 +25,7 @@ const RegisterPage = () => {
       setApiError(message || 'Registration failed. Please try again.');
     }
     if (isSuccess || user) {
-      navigate('/login'); // Redirect to login after successful registration
+      navigate('/'); // Redirect to homepage after successful registration
     }
     dispatch(reset());
   }, [user, isError, isSuccess, message, navigate, dispatch]);
@@ -85,7 +85,7 @@ const RegisterPage = () => {
         email: formData.email,
         password: formData.password
       };
-      await dispatch(registerUser(userData)).unwrap();
+      await dispatch(register(userData)).unwrap();
     } catch (error) {
       setApiError(error.message || 'Registration failed. Please try again.');
     }

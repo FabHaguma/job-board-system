@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../../services/api';
+import NotificationModal from '../NotificationModal';
 import './CreateJobForm.css';
 
 const CreateJobForm = ({ onJobCreated }) => {
@@ -15,6 +16,16 @@ const CreateJobForm = ({ onJobCreated }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
+
+  const closeNotification = () => {
+    setNotification({ ...notification, isOpen: false });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -82,10 +93,20 @@ const CreateJobForm = ({ onJobCreated }) => {
         onJobCreated({ ...formData, id: response.data.id });
       }
       
-      alert('Job created successfully!');
+      setNotification({
+        isOpen: true,
+        type: 'success',
+        title: 'Success!',
+        message: 'Job created successfully!'
+      });
     } catch (error) {
       console.error('Failed to create job:', error);
-      alert('Failed to create job. Please try again.');
+      setNotification({
+        isOpen: true,
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to create job. Please try again.'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -197,6 +218,16 @@ const CreateJobForm = ({ onJobCreated }) => {
           {isSubmitting ? 'Creating Job...' : 'Post Job'}
         </button>
       </form>
+      
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={closeNotification}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        autoClose={true}
+        autoCloseDelay={3000}
+      />
     </div>
   );
 };

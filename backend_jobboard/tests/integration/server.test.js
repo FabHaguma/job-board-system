@@ -118,7 +118,8 @@ describe('Server Integration Tests', () => {
         })
         .expect(201);
 
-      expect(registerResponse.body).toEqual({
+      expect(registerResponse.body).toHaveProperty('token');
+      expect(registerResponse.body.user).toEqual({
         id: 3,
         username: 'integrationuser',
         role: 'user'

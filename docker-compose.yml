@@ -19,7 +19,7 @@ services:
     networks:
       - internal_network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "https://jobboard.haguma.com/api/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -38,7 +38,7 @@ services:
       - caddy_network  # External network for Caddy proxy
       - internal_network  # Internal network to communicate with backend
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "https://jobboard.haguma.com/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -61,12 +61,23 @@ const JobDetailPage = () => {
       </div>
       
       <div className="job-detail-footer">
-        {user && user.role === 'user' && (
-          <button onClick={() => setShowApplyForm(!showApplyForm)}>
-            {showApplyForm ? 'Cancel Application' : 'Apply for this Job'}
-          </button>
+        {user && user.role === 'user' ? (
+          <>
+            <button onClick={() => setShowApplyForm(!showApplyForm)}>
+              {showApplyForm ? 'Cancel Application' : 'Apply for this Job'}
+            </button>
+            {showApplyForm && <ApplyForm jobId={job.id} />}
+          </>
+        ) : (
+          !user && (
+            <div className="login-to-apply">
+              <p>
+                To apply for this job, please <Link to="/login">log in</Link> or{' '}
+                <Link to="/register">create an account</Link>.
+              </p>
+            </div>
+          )
         )}
-        {showApplyForm && <ApplyForm jobId={job.id} />}
       </div>
     </div>
   );

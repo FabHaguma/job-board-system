@@ -34,7 +34,7 @@ describe('Auth Routes Integration', () => {
   });
 
   describe('POST /api/auth/register', () => {
-    it('should register a new user', async () => {
+    it('should register a new user and return token + user', async () => {
       // Mock successful database insertion
       db.run.mockImplementation((sql, params, callback) => {
         callback.call({ lastID: 3 }, null);
@@ -50,7 +50,8 @@ describe('Auth Routes Integration', () => {
         .send(userData)
         .expect(201);
 
-      expect(response.body).toEqual({
+      expect(response.body).toHaveProperty('token');
+      expect(response.body.user).toEqual({
         id: 3,
         username: 'newuser',
         role: 'user'

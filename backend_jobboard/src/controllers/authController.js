@@ -17,7 +17,29 @@ const registerUser = (req, res) => {
     if (err) {
         return res.status(400).json({ message: 'Username already exists' });
     }
-    res.status(201).json({ id: this.lastID, username, role });
+
+    // Auto-generate JWT token upon successful registration (auto-login)
+    try {
+      const token = jwt.sign(
+        { id: this.lastID, role },
+        process.env.JWT_SECRET,
+        { expiresIn: '1d' }
+      );
+
+      return res.status(201).json({
+        token,
+        user: {
+          id: this.lastID,
+          username,
+          role,
+        },
+      });
+    } catch (e) {
+      // If token generation fails, still return created user without token
+      return res.status(201).json({
+        user: { id: this.lastID, username, role },
+      });
+    }
   });
 };
 
